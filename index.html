@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Salario y Tiempo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Salario y Tiempo</h1>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch">
+                    <select id="themeSelect">
+                        <option value="system">Sistema</option>
+                        <option value="light">Claro</option>
+                        <option value="dark">Oscuro</option>
+                    </select>
+                    <span class="theme-icon">🌓</span>
+                </label>
+            </div>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="salary">Cálculo de Salario</button>
+            <button class="tab-button" data-tab="project">Estimación de Proyecto</button>
+            <button class="tab-button" data-tab="projectCost">Costo de Proyecto</button>
+            <button class="tab-button" data-tab="crSalary">Calculadora CR</button>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="salary">
+                <div class="calculator-section">
+                    <h2>Cálculo de Salario</h2>
+                    <div class="input-group">
+                        <label for="amount">Cantidad:</label>
+                        <input type="number" id="amount" min="0" step="0.01">
+                        <select id="timeUnit">
+                            <option value="hour">Por Hora</option>
+                            <option value="day">Por Día</option>
+                            <option value="week">Por Semana</option>
+                            <option value="month">Por Mes</option>
+                            <option value="year">Por Año</option>
+                        </select>
+                    </div>
+                    
+                    <div class="results" id="salaryResults">
+                        <h3>Resultados:</h3>
+                        <p>Por Hora: <span id="hourly">$0.00</span></p>
+                        <p>Por Día: <span id="daily">$0.00</span></p>
+                        <p>Por Semana: <span id="weekly">$0.00</span></p>
+                        <p>Por Mes: <span id="monthly">$0.00</span></p>
+                        <p>Por Año: <span id="yearly">$0.00</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="project">
+                <div class="calculator-section">
+                    <h2>Estimación de Tiempo de Proyecto</h2>
+                    <div class="input-group">
+                        <label for="projectHours">Horas Necesarias:</label>
+                        <input type="number" id="projectHours" min="0">
+                        <label for="hoursPerDay">Horas de trabajo por día:</label>
+                        <input type="number" id="hoursPerDay" min="1" max="24" value="8">
+                    </div>
+                    
+                    <div class="results" id="projectResults">
+                        <h3>Duración Estimada:</h3>
+                        <p>Días: <span id="projectDays">0</span></p>
+                        <p>Semanas: <span id="projectWeeks">0</span></p>
+                        <p>Meses: <span id="projectMonths">0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="projectCost">
+                <div class="calculator-section">
+                    <h2>Cálculo de Costo de Proyecto</h2>
+                    <div class="input-group">
+                        <label for="monthlyRate">Tarifa por Hora:</label>
+                        <input type="number" id="monthlyRate" min="0" step="0.01" placeholder="Ingrese tarifa por hora">
+                        
+                        <label for="hoursPerMonth">Horas por Mes:</label>
+                        <input type="number" id="hoursPerMonth" min="0" value="160" placeholder="Horas mensuales">
+                        
+                        <label for="projectDuration">Duración del Proyecto (Meses):</label>
+                        <input type="number" id="projectDuration" min="1" value="1" placeholder="Número de meses">
+                        
+                        <label for="ivaRate">Tasa de IVA (%):</label>
+                        <input type="number" id="ivaRate" min="0" max="100" value="16" placeholder="Porcentaje de IVA">
+                    </div>
+                    
+                    <div class="results" id="projectCostResults">
+                        <h3>Resultados del Proyecto:</h3>
+                        <p>Costo por Mes (sin IVA): <span id="monthCostNoIva">$0.00</span></p>
+                        <p>IVA por Mes: <span id="monthIva">$0.00</span></p>
+                        <p>Costo por Mes (con IVA): <span id="monthCostWithIva">$0.00</span></p>
+                        <hr>
+                        <p>Costo Total del Proyecto (sin IVA): <span id="totalCostNoIva">$0.00</span></p>
+                        <p>IVA Total: <span id="totalIva">$0.00</span></p>
+                        <p>Costo Total del Proyecto (con IVA): <span id="totalCostWithIva">$0.00</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="crSalary">
+                <div class="calculator-section">
+                    <h2>Calculadora Salarial Costa Rica</h2>
+                    
+                    <div class="input-group">
+                        <h3>1. Ingresos Salariales</h3>
+                        <label for="salarioOrdinario">Salario Ordinario:</label>
+                        <input type="number" id="salarioOrdinario" min="0" step="1000" placeholder="Ingrese salario ordinario">
+                        
+                        <label for="comisiones">Comisiones:</label>
+                        <input type="number" id="comisiones" min="0" step="100" placeholder="Ingrese comisiones">
+                        
+                        <label for="bonificacionesRecurrentes">Bonificaciones Salariales Recurrentes:</label>
+                        <input type="number" id="bonificacionesRecurrentes" min="0" step="100" placeholder="Bonificaciones recurrentes">
+                        
+                        <label for="horasExtras">Horas Extras:</label>
+                        <input type="number" id="horasExtras" min="0" step="100" placeholder="Monto por horas extras">
+                        
+                        <label for="vacaciones">Vacaciones Compensadas:</label>
+                        <input type="number" id="vacaciones" min="0" step="100" placeholder="Vacaciones compensadas">
+                    </div>
+
+                    <div class="input-group">
+                        <h3>2. Otros Ingresos Salariales</h3>
+                        <label for="bonificacionesOcasionales">Bonificaciones Salariales Ocasionales:</label>
+                        <input type="number" id="bonificacionesOcasionales" min="0" step="100" placeholder="Bonificaciones ocasionales">
+                        
+                        <label for="participacionUtilidades">Participación de Utilidades:</label>
+                        <input type="number" id="participacionUtilidades" min="0" step="100" placeholder="Participación utilidades">
+                    </div>
+
+                    <div class="input-group">
+                        <h3>3. Reembolso de Gastos (No gravables)</h3>
+                        <label for="combustible">Pago de Combustible:</label>
+                        <input type="number" id="combustible" min="0" step="100" placeholder="Reembolso combustible">
+                        
+                        <label for="telefono">Teléfono Celular:</label>
+                        <input type="number" id="telefono" min="0" step="100" placeholder="Reembolso teléfono">
+                        
+                        <label for="transporte">Transporte:</label>
+                        <input type="number" id="transporte" min="0" step="100" placeholder="Reembolso transporte">
+                        
+                        <label for="otrosReembolsos">Otros Reembolsos:</label>
+                        <input type="number" id="otrosReembolsos" min="0" step="100" placeholder="Otros reembolsos">
+                    </div>
+
+                    <div class="input-group">
+                        <h3>4. Deducciones Personalizables</h3>
+                        <label for="asociacionSolidarista">Asociación Solidarista (%):</label>
+                        <input type="number" id="asociacionSolidarista" min="0" max="100" step="0.01" value="5" placeholder="Porcentaje (usualmente 5%)">
+                        
+                        <label for="pensionVoluntaria">Plan de Pensión Voluntaria (%):</label>
+                        <input type="number" id="pensionVoluntaria" min="0" max="30" step="0.01" value="0" placeholder="Máximo 30% del salario">
+                        <small class="input-help">*Exento de cargas sociales e impuesto hasta un 10% del salario bruto</small>
+                    </div>
+                    
+                    <div class="results" id="crSalaryResults">
+                        <h3>Resumen de Ingresos:</h3>
+                        <p>Total Ingresos Salariales: <span id="totalIngresosSalariales">₡0</span></p>
+                        <p>Total Otros Ingresos: <span id="totalOtrosIngresos">₡0</span></p>
+                        <p>Total Reembolsos: <span id="totalReembolsos">₡0</span></p>
+                        
+                        <h3>Deducciones Obligatorias:</h3>
+                        <p>CCSS Enfermedad y Maternidad (5.5%): <span id="ccssEM">₡0</span></p>
+                        <p>CCSS Invalidez y Muerte (2.67%): <span id="ccssIVM">₡0</span></p>
+                        <p>Banco Popular (1%): <span id="bancoPop">₡0</span></p>
+                        <p>Asociación Solidarista: <span id="montoSolidarista">₡0</span></p>
+                        <p>Plan de Pensión Voluntaria: <span id="montoPensionVoluntaria">₡0</span></p>
+                        
+                        <hr>
+                        <h3>Cálculo de Impuesto de Renta:</h3>
+                        <p>Salario Bruto Total: <span id="salarioBrutoTotal">₡0</span></p>
+                        <p>Base Imponible: <span id="baseImponible">₡0</span></p>
+                        <p>Impuesto de Renta: <span id="impuestoRenta">₡0</span></p>
+                        
+                        <hr>
+                        <h3>Totales:</h3>
+                        <p>Total Deducciones: <span id="totalDeducciones">₡0</span></p>
+                        <p class="total-neto">Salario Neto: <span id="salarioNeto">₡0</span></p>
+                    </div>
+                    
+                    <div class="help-section">
+                        <button id="showGuide" class="help-button">
+                            <i class="help-icon">?</i>
+                            Guía para el ingreso de datos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Guía -->
+            <div id="guideModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Guía para el ingreso de datos</h2>
+                    
+                    <div class="guide-section">
+                        <h3>1. Ingresos salariales</h3>
+                        <ul>
+                            <li>Salario ordinario</li>
+                            <li>Comisiones</li>
+                            <li>Bonificaciones salariales recurrentes</li>
+                            <li>Horas extras</li>
+                            <li>Vacaciones compensadas</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>2. Otros ingresos salariales</h3>
+                        <ul>
+                            <li>Bonificaciones salariales ocasionales</li>
+                            <li>Participación de utilidades</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>3. Reembolso de gastos no salariales ni gravables</h3>
+                        <ul>
+                            <li>Pago de combustible</li>
+                            <li>Teléfono celular</li>
+                            <li>Transporte</li>
+                            <li>Otros reembolsos</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>4. Deducciones</h3>
+                        <h4>Seguro Social</h4>
+                        <ul>
+                            <li>CCSS Enfermedad y Maternidad: 5.5%</li>
+                            <li>CCSS Invalidez y Muerte: 2.67%</li>
+                            <li>Banco Popular: 1%</li>
+                        </ul>
+
+                        <h4>Asociación Solidarista</h4>
+                        <ul>
+                            <li>Usualmente 5% pero es variable de acuerdo a cada empresa</li>
+                        </ul>
+
+                        <h4>Planes de Pensiones Voluntarias</h4>
+                        <ul>
+                            <li>Se puede destinar hasta el 30% del salario</li>
+                            <li>Exento de cargas sociales e impuesto hasta un 10% del salario bruto</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>5. Impuesto sobre la Renta (mensual)</h3>
+                        <ul>
+                            <li>Exento hasta ₡863,000</li>
+                            <li>10% de ₡863,001 a ₡1,267,000</li>
+                            <li>15% de ₡1,267,001 a ₡2,223,000</li>
+                            <li>20% de ₡2,223,001 a ₡4,445,000</li>
+                            <li>25% sobre ₡4,445,001</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
