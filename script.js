@@ -1,7 +1,7 @@
 // Constantes para cálculos
 const HOURS_PER_DAY = 8;
 const DAYS_PER_WEEK = 5;
-const WEEKS_PER_MONTH = 4;
+const WEEKS_PER_MONTH = 4.33;
 const MONTHS_PER_YEAR = 12;
 
 // Elementos del DOM
@@ -9,11 +9,11 @@ const amountInput = document.getElementById('amount');
 const timeUnitSelect = document.getElementById('timeUnit');
 const projectHoursInput = document.getElementById('projectHours');
 const hoursPerDayInput = document.getElementById('hoursPerDay');
+const daysPerWeekInput = document.getElementById('daysPerWeek');
 
 // Elementos para cálculo de costo de proyecto
 const monthlyRateInput = document.getElementById('monthlyRate');
-const hoursPerMonthInput = document.getElementById('hoursPerMonth');
-const projectMonthsInput = document.getElementById('projectDuration');
+const projectMonthsInput = document.getElementById('projectMonths');
 const ivaRateInput = document.getElementById('ivaRate');
 
 // Elementos para calculadora CR
@@ -30,6 +30,27 @@ const transporteInput = document.getElementById('transporte');
 const otrosReembolsosInput = document.getElementById('otrosReembolsos');
 const asociacionSoldaristaInput = document.getElementById('asociacionSolidarista');
 const pensionVoluntariaInput = document.getElementById('pensionVoluntaria');
+
+// Elementos para tabs
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabPanes = document.querySelectorAll('.tab-pane');
+
+// Event listeners para tabs
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+        
+        // Remover clase activa de todos los botones y panes
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanes.forEach(pane => pane.classList.remove('active'));
+        
+        // Agregar clase activa al botón clickeado
+        button.classList.add('active');
+        
+        // Mostrar el panel correspondiente
+        document.getElementById(tabId).classList.add('active');
+    });
+});
 
 // Constantes para deducciones CR
 const CCSS_EM_RATE = 0.055;  // 5.5%
@@ -73,9 +94,10 @@ function calculateSalary() {
 function calculateProjectTime() {
     const totalHours = parseFloat(projectHoursInput.value) || 0;
     const hoursPerDay = parseFloat(hoursPerDayInput.value) || HOURS_PER_DAY;
+    const daysPerWeek = parseFloat(daysPerWeekInput.value) || DAYS_PER_WEEK;
 
     const days = totalHours / hoursPerDay;
-    const weeks = days / DAYS_PER_WEEK;
+    const weeks = days / daysPerWeek;
     const months = weeks / WEEKS_PER_MONTH;
 
     document.getElementById('projectDays').textContent = formatNumber(days);
@@ -85,45 +107,47 @@ function calculateProjectTime() {
 
 // Función para calcular costos del proyecto
 function calculateProjectCosts() {
-    // Obtener valores de los inputs
-    const hourlyRate = parseFloat(monthlyRateInput.value) || 0;
-    const hoursPerMonth = parseFloat(hoursPerMonthInput.value) || 0;
-    const projectMonths = parseFloat(projectMonthsInput.value) || 1; // Mínimo 1 mes
+    const monthlyRate = parseFloat(monthlyRateInput.value) || 0;
+    const months = parseFloat(projectMonthsInput.value) || 1;
     const ivaRate = parseFloat(ivaRateInput.value) || 0;
 
-    // Cálculos mensuales
-    const monthCostNoIva = hourlyRate * hoursPerMonth;
-    const monthIva = (monthCostNoIva * ivaRate) / 100;
-    const monthCostWithIva = monthCostNoIva + monthIva;
+    const baseCost = monthlyRate * months;
+    const ivaCost = (baseCost * ivaRate) / 100;
+    const totalCost = baseCost + ivaCost;
 
-    // Cálculos totales para todo el proyecto
-    const totalCostNoIva = monthCostNoIva * projectMonths;
-    const totalIva = monthIva * projectMonths;
-    const totalCostWithIva = monthCostWithIva * projectMonths;
+    document.getElementById('baseCost').textContent = formatCurrency(baseCost);
+    document.getElementById('ivaCost').textContent = formatCurrency(ivaCost);
+    document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+}
 
-    // Actualizar resultados mensuales
-    document.getElementById('monthCostNoIva').textContent = formatCurrency(monthCostNoIva);
-    document.getElementById('monthIva').textContent = formatCurrency(monthIva);
-    document.getElementById('monthCostWithIva').textContent = formatCurrency(monthCostWithIva);
+// Función para calcular salario CR
+function calculateCRSalary() {
+    // Calcular salario bruto
+    const salarioBruto = calcularSalarioBruto();
+    
+    // Calcular deducciones
+    const ccssEm = salarioBruto * CCSS_EM_RATE;
+    const ccssIvm = salarioBruto * CCSS_IVM_RATE;
+    const bancoPop = salarioBruto * BANCO_POPULAR_RATE;
+    const asoc = salarioBruto * (parseFloat(asociacionSoldaristaInput.value) / 100 || 0);
+    const pension = salarioBruto * (parseFloat(pensionVoluntariaInput.value) / 100 || 0);
+    const renta = calcularImpuestoRenta(salarioBruto);
+    
+    const totalDeducciones = ccssEm + ccssIvm + bancoPop + asoc + pension + renta;
+    const salarioNeto = salarioBruto - totalDeducciones;
 
-    // Actualizar resultados totales del proyecto
-    document.getElementById('totalCostNoIva').textContent = formatCurrency(totalCostNoIva);
-    document.getElementById('totalIva').textContent = formatCurrency(totalIva);
-    document.getElementById('totalCostWithIva').textContent = formatCurrency(totalCostWithIva);
-
-    // Debug - mostrar en consola para verificar
-    console.log('Cálculos del proyecto:', {
-        hourlyRate,
-        hoursPerMonth,
-        projectMonths,
-        ivaRate,
-        monthCostNoIva,
-        monthIva,
-        monthCostWithIva,
-        totalCostNoIva,
-        totalIva,
-        totalCostWithIva
-    });
+    // Actualizar resultados
+    document.getElementById('salarioBruto').textContent = formatCurrencyCRC(salarioBruto);
+    document.getElementById('totalDeducciones').textContent = formatCurrencyCRC(totalDeducciones);
+    document.getElementById('salarioNeto').textContent = formatCurrencyCRC(salarioNeto);
+    
+    // Desglose de deducciones
+    document.getElementById('ccssEm').textContent = formatCurrencyCRC(ccssEm);
+    document.getElementById('ccssIvm').textContent = formatCurrencyCRC(ccssIvm);
+    document.getElementById('bancoPop').textContent = formatCurrencyCRC(bancoPop);
+    document.getElementById('asoc').textContent = formatCurrencyCRC(asoc);
+    document.getElementById('pension').textContent = formatCurrencyCRC(pension);
+    document.getElementById('renta').textContent = formatCurrencyCRC(renta);
 }
 
 // Función para calcular impuesto sobre la renta 2023
@@ -152,8 +176,8 @@ function calcularImpuestoRenta(baseImponibleMensual) {
     return impuestoAnual / 12; // Retorno mensual
 }
 
-// Función para calcular salario CR
-function calculateCRSalary() {
+// Función para calcular salario bruto
+function calcularSalarioBruto() {
     // 1. Ingresos Salariales
     const salarioOrdinario = parseFloat(salarioOrdinarioInput.value) || 0;
     const comisiones = parseFloat(comisionesInput.value) || 0;
@@ -184,47 +208,7 @@ function calculateCRSalary() {
     // Base para deducciones
     const baseParaDeducciones = totalIngresosSalariales + totalOtrosIngresos;
     
-    // Calcular deducciones
-    const ccssEM = baseParaDeducciones * CCSS_EM_RATE;
-    const ccssIVM = baseParaDeducciones * CCSS_IVM_RATE;
-    const bancoPop = baseParaDeducciones * BANCO_POPULAR_RATE;
-    const montoSolidarista = baseParaDeducciones * (asociacionSolidarista / 100);
-    
-    // Pensión voluntaria (máximo 10% para exención de impuestos)
-    const pensionVoluntariaMax = baseParaDeducciones * 0.10;
-    const montoPensionVoluntaria = Math.min(
-        baseParaDeducciones * (pensionVoluntaria / 100),
-        pensionVoluntariaMax
-    );
-
-    // Base imponible para impuesto de renta
-    const baseImponible = baseParaDeducciones - montoPensionVoluntaria;
-    const impuestoRenta = calcularImpuestoRenta(baseImponible);
-
-    // Total deducciones
-    const totalDeducciones = ccssEM + ccssIVM + bancoPop + montoSolidarista + 
-                           montoPensionVoluntaria + impuestoRenta;
-
-    // Salario neto
-    const salarioNeto = baseParaDeducciones + totalReembolsos - totalDeducciones;
-
-    // Actualizar resultados
-    document.getElementById('totalIngresosSalariales').textContent = formatCurrencyCRC(totalIngresosSalariales);
-    document.getElementById('totalOtrosIngresos').textContent = formatCurrencyCRC(totalOtrosIngresos);
-    document.getElementById('totalReembolsos').textContent = formatCurrencyCRC(totalReembolsos);
-    
-    document.getElementById('ccssEM').textContent = formatCurrencyCRC(ccssEM);
-    document.getElementById('ccssIVM').textContent = formatCurrencyCRC(ccssIVM);
-    document.getElementById('bancoPop').textContent = formatCurrencyCRC(bancoPop);
-    document.getElementById('montoSolidarista').textContent = formatCurrencyCRC(montoSolidarista);
-    document.getElementById('montoPensionVoluntaria').textContent = formatCurrencyCRC(montoPensionVoluntaria);
-    
-    document.getElementById('salarioBrutoTotal').textContent = formatCurrencyCRC(baseParaDeducciones);
-    document.getElementById('baseImponible').textContent = formatCurrencyCRC(baseImponible);
-    document.getElementById('impuestoRenta').textContent = formatCurrencyCRC(impuestoRenta);
-    
-    document.getElementById('totalDeducciones').textContent = formatCurrencyCRC(totalDeducciones);
-    document.getElementById('salarioNeto').textContent = formatCurrencyCRC(salarioNeto);
+    return baseParaDeducciones;
 }
 
 // Manejo de temas
@@ -267,87 +251,72 @@ if (window.matchMedia) {
     });
 }
 
-// Función para formatear moneda
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2
-    }).format(amount);
-}
-
-// Función para formatear números
-function formatNumber(number) {
-    return new Intl.NumberFormat('es-ES', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-    }).format(number);
-}
-
-// Función para formatear moneda en colones
-function formatCurrencyCRC(amount) {
-    return new Intl.NumberFormat('es-CR', {
-        style: 'currency',
-        currency: 'CRC',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(amount);
-}
-
-// Manejo de tabs
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabPanes = document.querySelectorAll('.tab-pane');
-
-function switchTab(tabId) {
-    // Desactivar todos los tabs
-    tabButtons.forEach(button => button.classList.remove('active'));
-    tabPanes.forEach(pane => pane.classList.remove('active'));
-    
-    // Activar el tab seleccionado
-    const selectedButton = document.querySelector(`[data-tab="${tabId}"]`);
-    const selectedPane = document.getElementById(tabId);
-    
-    selectedButton.classList.add('active');
-    selectedPane.classList.add('active');
-}
-
-// Event listeners para tabs
-tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const tabId = button.getAttribute('data-tab');
-        switchTab(tabId);
-    });
-});
-
 // Modal de guía
 const modal = document.getElementById('guideModal');
 const showGuideBtn = document.getElementById('showGuide');
 const closeBtn = document.querySelector('.close-button');
 
-showGuideBtn.addEventListener('click', () => {
-    modal.style.display = 'block';
-});
+if (showGuideBtn) {
+    showGuideBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
+}
 
-closeBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-});
+if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+}
 
+// Cerrar modal al hacer clic fuera de él
 window.addEventListener('click', (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
 });
 
-// Event listeners
+// Función para formatear números
+function formatNumber(number) {
+    return new Intl.NumberFormat('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    }).format(number);
+}
+
+// Función para formatear moneda USD
+function formatCurrency(amount) {
+    const formatted = new Intl.NumberFormat('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    }).format(amount);
+    return formatted + ' US$';
+}
+
+// Función para formatear moneda CRC
+function formatCurrencyCRC(amount) {
+    const formatted = new Intl.NumberFormat('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+    }).format(amount);
+    return '₡' + formatted;
+}
+
+// Event listeners para cálculos
 amountInput.addEventListener('input', calculateSalary);
 timeUnitSelect.addEventListener('change', calculateSalary);
+
 projectHoursInput.addEventListener('input', calculateProjectTime);
 hoursPerDayInput.addEventListener('input', calculateProjectTime);
-monthlyRateInput.addEventListener('input', calculateProjectCosts);
-hoursPerMonthInput.addEventListener('input', calculateProjectCosts);
+daysPerWeekInput.addEventListener('input', calculateProjectTime);
+
 projectMonthsInput.addEventListener('input', calculateProjectCosts);
+monthlyRateInput.addEventListener('input', calculateProjectCosts);
 ivaRateInput.addEventListener('input', calculateProjectCosts);
 
+// Event listeners para calculadora CR
 const crInputs = [
     salarioOrdinarioInput, comisionesInput, bonificacionesRecurrentesInput,
     horasExtrasInput, vacacionesInput, bonificacionesOcasionalesInput,
@@ -357,7 +326,9 @@ const crInputs = [
 ];
 
 crInputs.forEach(input => {
-    input.addEventListener('input', calculateCRSalary);
+    if (input) { // Verificar que el input existe
+        input.addEventListener('input', calculateCRSalary);
+    }
 });
 
 // Calcular inicialmente
@@ -365,3 +336,8 @@ calculateSalary();
 calculateProjectTime();
 calculateProjectCosts();
 calculateCRSalary();
+
+// Activar el primer tab por defecto
+if (tabButtons.length > 0) {
+    tabButtons[0].click();
+}
