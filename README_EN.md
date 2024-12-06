@@ -135,6 +135,9 @@ This project is under the MIT License - see the [LICENSE.md](LICENSE.md) file fo
 
 Contributions are welcome. Please open an issue first to discuss the changes you would like to make.
 
+## Legal information reference 
+Salary Calculator from [elempleo.com Costa Rica](https://www.elempleo.com/cr/calculadora-salarial) 
+
 ## 🌐 Language
 
 This documentation is also available in [Spanish](README.md).
