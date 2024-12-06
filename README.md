@@ -135,6 +135,9 @@ Este proyecto está bajo la Licencia MIT - vea el archivo [LICENSE.md](LICENSE.m
 
 Las contribuciones son bienvenidas. Por favor, abra un issue primero para discutir los cambios que le gustaría hacer.
 
+## Referencia de informacion legal
+Calculadora salarial de [elempleo.com Costa Rica](https://www.elempleo.com/cr/calculadora-salarial) 
+
 ## 🌐 Idioma
 
 Esta documentación también está disponible en [Inglés](README_EN.md).
